@@ -15,10 +15,18 @@ LINQRA_INVENTORY_SERVICE/
         │           └── inventory/
         │               ├── InventoryServiceApplication.java
         │               ├── config/
-        │               │   └── EurekaClientConfig.java
+        │               │   ├── EurekaClientConfig.java
+        │               │   ├── RestTemplateConfig.java
+        │               │   └── SecurityConfig.java
         │               ├── controller/
+        │               │   ├── HealthController.java
         │               │   └── InventoryController.java 
+        │               ├── filter/
+        │               │   └── JwtRoleValidationFilter.java
+        │               ├── interceptor/
+        │               │   └── ServiceNameInterceptor.java
         │               └── model/
+        │                   ├── HealthStatus.java
         │                   ├── InventoryItem.java
         │                   ├── ProductAvailabilityResponse.java
         │                   └── ProductInfo.java
@@ -31,6 +39,9 @@ LINQRA_INVENTORY_SERVICE/
 - CRUD operations for inventory items
 - Integration with Product Service through an API gateway
 - Enhanced product availability information that combines product data with inventory status
+- JWT-based security and role validation
+- Health check endpoints for service monitoring
+- Custom interceptors for service name annotation
 
 ## Prerequisites
 
@@ -59,6 +70,12 @@ These components need to be started before launching this Inventory Service. The
 |--------|----------|-------------|
 | GET    | `/api/inventory/product-availability` | Get product availability information from Product Service |
 | GET    | `/api/inventory/product-availability?productId={id}` | Get availability for a specific product |
+
+### Health Checking
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | `/health` | Get service health status information |
 
 ## How to Use
 
@@ -117,6 +134,11 @@ These components need to be started before launching this Inventory Service. The
 #### Get Product Availability
 - **Method**: GET
 - **URL**: `https://localhost:7777/inventory-service/api/inventory/product-availability`
+- **Headers**: `Accept: application/json`
+
+#### Check Service Health
+- **Method**: GET
+- **URL**: `https://localhost:7777/inventory-service/health`
 - **Headers**: `Accept: application/json`
 
 ## Configuration
