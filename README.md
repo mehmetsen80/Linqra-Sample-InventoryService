@@ -32,6 +32,15 @@ LINQRA_INVENTORY_SERVICE/
 - Integration with Product Service through an API gateway
 - Enhanced product availability information that combines product data with inventory status
 
+## Prerequisites
+
+Before running this service, you must have the following components of the main Linqra application up and running:
+
+1. **Discovery Server (Eureka)** - For service registration and discovery
+2. **API Gateway** - For routing requests to the appropriate microservices
+
+These components need to be started before launching this Inventory Service. The service is configured to register with the Eureka server and communicate through the API gateway.
+
 ## API Endpoints
 
 ### Inventory Management
@@ -53,21 +62,27 @@ LINQRA_INVENTORY_SERVICE/
 
 ## How to Use
 
+### Starting the Service
+
+1. First, ensure the Linqra Discovery Server and API Gateway services are running
+2. Then start the Inventory Service, which will register with Eureka automatically
+3. All requests should be routed through the API Gateway
+
 ### API Examples (Postman)
 
 #### Get All Inventory Items
 - **Method**: GET
-- **URL**: `http://localhost:8080/api/inventory`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory`
 - **Headers**: `Accept: application/json`
 
 #### Get Specific Inventory Item
 - **Method**: GET
-- **URL**: `http://localhost:8080/api/inventory/1`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
 - **Headers**: `Accept: application/json`
 
 #### Create New Inventory Item
 - **Method**: POST
-- **URL**: `http://localhost:8080/api/inventory`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory`
 - **Headers**: 
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -82,7 +97,7 @@ LINQRA_INVENTORY_SERVICE/
 
 #### Update Existing Inventory Item
 - **Method**: PUT
-- **URL**: `http://localhost:8080/api/inventory/1`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
 - **Headers**: 
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -97,11 +112,11 @@ LINQRA_INVENTORY_SERVICE/
 
 #### Delete Inventory Item
 - **Method**: DELETE
-- **URL**: `http://localhost:8080/api/inventory/3`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/3`
 
 #### Get Product Availability
 - **Method**: GET
-- **URL**: `http://localhost:8080/api/inventory/product-availability`
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/product-availability`
 - **Headers**: `Accept: application/json`
 
 ## Configuration
@@ -110,7 +125,7 @@ In the `application.yml` file:
 
 ```yaml
 gateway:
-  base-url: http://localhost:8080  # Set to your API gateway URL
+  base-url: https://localhost:7777/inventory-service  # Set to your API gateway URL
 ```
 
 ## Dependencies
@@ -130,8 +145,17 @@ cd LINQRA_INVENTORY_SERVICE
 mvn spring-boot:run
 ```
 
+## Service Startup Order
+
+For proper functionality, services should be started in the following order:
+1. Discovery Server (Eureka)
+2. API Gateway
+3. Inventory Service (this service)
+4. Other microservices (Product Service, etc.)
+
 ## Notes
 
 - This service is designed to work with Eureka for service discovery
 - Mock data is provided for demonstration purposes
 - For production use, replace the in-memory storage with a proper database
+- Communication between services happens through the API Gateway

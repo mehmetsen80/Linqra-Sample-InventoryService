@@ -12,5 +12,5 @@ public class ProductAvailabilityResponse {
     private List<ProductInfo> products;
     private String timestamp;
     private String serviceSource = "product-service";
-    private String inventoryStatus;
+    private String productStatus;
 } 
