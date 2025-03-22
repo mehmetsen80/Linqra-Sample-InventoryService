@@ -69,10 +69,20 @@ These components need to be started before launching this Inventory Service. The
 
 ### Service Integration
 
+This service communicates with the Product Service microservice. Before using these endpoints, ensure:
+- Product Service is up and running
+- Product Service is registered with Eureka
+- API Gateway is properly routing requests to Product Service
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET    | `/api/inventory/product-availability` | Get product availability information from Product Service |
 | GET    | `/api/inventory/product-availability?productId={id}` | Get availability for a specific product |
+
+**Note**: These endpoints combine data from both services:
+- Product information is fetched from the Product Service
+- Inventory status (in-stock, quantity, delivery estimates) is added by the Inventory Service
+- If Product Service is unavailable, these endpoints will return a 500 Internal Server Error
 
 ### Health Checking
 
