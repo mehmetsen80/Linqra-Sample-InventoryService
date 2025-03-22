@@ -63,6 +63,9 @@ These components need to be started before launching this Inventory Service. The
 | POST   | `/api/inventory` | Create a new inventory item |
 | PUT    | `/api/inventory/{id}` | Update an existing inventory item |
 | DELETE | `/api/inventory/{id}` | Delete an inventory item |
+| PATCH  | `/api/inventory/{id}` | Partially update an inventory item |
+| HEAD   | `/api/inventory/{id}` | Check if item exists (returns headers only) |
+| OPTIONS| `/api/inventory/{id}` | Get available HTTP methods for the resource |
 
 ### Service Integration
 
