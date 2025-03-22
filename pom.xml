@@ -85,7 +85,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.lite.product.InventoryServiceApplication</mainClass>
+                            <mainClass>org.lite.inventory.InventoryServiceApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

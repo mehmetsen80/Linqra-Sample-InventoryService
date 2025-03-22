@@ -5,6 +5,7 @@ import org.lite.inventory.model.InventoryItem;
 import org.lite.inventory.model.ProductAvailabilityResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -91,10 +92,58 @@ public class InventoryController {
         }
     }
 
+    // PATCH - Update partial inventory item
+    @PatchMapping("/{id}")
+    public ResponseEntity<InventoryItem> patchItem(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        if (!inventoryItems.containsKey(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        InventoryItem existingItem = inventoryItems.get(id);
+        
+        // Apply only the fields that are present in the update request
+        if (updates.containsKey("name")) {
+            existingItem.setName((String) updates.get("name"));
+        }
+        if (updates.containsKey("quantity")) {
+            existingItem.setQuantity(((Number) updates.get("quantity")).intValue());
+        }
+        if (updates.containsKey("price")) {
+            existingItem.setPrice(((Number) updates.get("price")).doubleValue());
+        }
+
+        inventoryItems.put(id, existingItem);
+        return ResponseEntity.ok(existingItem);
+    }
+
+    // HEAD - Check if inventory item exists (returns only headers, no body)
+    @RequestMapping(value = "/{id}", method = RequestMethod.HEAD)
+    public ResponseEntity<Void> headItem(@PathVariable Long id) {
+        if (inventoryItems.containsKey(id)) {
+            return ResponseEntity
+                .ok()
+                .header("X-Item-Found", "true")
+                .header("X-Item-Quantity", String.valueOf(inventoryItems.get(id).getQuantity()))
+                .build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // OPTIONS - Show available methods for inventory items
+    @RequestMapping(value = "/{id}", method = RequestMethod.OPTIONS)
+    public ResponseEntity<Void> optionsForItem(@PathVariable Long id) {
+        return ResponseEntity
+            .ok()
+            .allow(HttpMethod.GET, HttpMethod.PUT, HttpMethod.PATCH, 
+                  HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.OPTIONS)
+            .header("X-Item-Exists", String.valueOf(inventoryItems.containsKey(id)))
+            .build();
+    }
+
     @GetMapping(value = "/product-availability", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductAvailabilityResponse> getProductAvailability(
             @RequestParam(required = false) String productId) {
-        String url = gatewayBaseUrl + "/product-service/products";
+        String url = gatewayBaseUrl + "/product-service/api/product/products";
         if (productId != null) {
             url += "/" + productId;
         }

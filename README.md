@@ -131,6 +131,35 @@ These components need to be started before launching this Inventory Service. The
 - **Method**: DELETE
 - **URL**: `https://localhost:7777/inventory-service/api/inventory/3`
 
+#### Patch Inventory Item (Partial Update)
+- **Method**: PATCH
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **Headers**: 
+  - `Content-Type: application/json`
+  - `Accept: application/json`
+- **Body**:
+```json
+{
+    "quantity": 25
+}
+```
+
+#### Check Item Existence (HEAD)
+- **Method**: HEAD
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **Headers**: `Accept: application/json`
+- **Response Headers**:
+  - `X-Item-Found`: indicates if item exists
+  - `X-Item-Quantity`: shows current quantity if item exists
+
+#### Get Available Methods (OPTIONS)
+- **Method**: OPTIONS
+- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **Headers**: `Accept: application/json`
+- **Response Headers**:
+  - `Allow`: lists all allowed HTTP methods
+  - `X-Item-Exists`: indicates if the item exists
+
 #### Get Product Availability
 - **Method**: GET
 - **URL**: `https://localhost:7777/inventory-service/api/inventory/product-availability`
