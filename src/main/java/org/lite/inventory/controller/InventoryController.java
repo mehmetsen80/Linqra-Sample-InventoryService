@@ -107,23 +107,37 @@ public class InventoryController {
         return new ResponseEntity<>(newItem, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Update an existing inventory item")
+    @Operation(summary = "Update an existing inventory item",
+              description = "Updates all fields of an existing inventory item with the provided data")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Item updated successfully"),
-        @ApiResponse(responseCode = "404", description = "Item not found")
+        @ApiResponse(responseCode = "200", 
+                    description = "Item updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InventoryItem.class))),
+        @ApiResponse(responseCode = "404", 
+                    description = "Item not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<InventoryItem> updateItem(
-        @Parameter(description = "ID of item to be updated") 
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateItem(
+        @Parameter(description = "ID of item to be updated", required = true) 
         @PathVariable Long id,
-        @Parameter(description = "Updated item details") 
+        @Parameter(description = "Updated item details", required = true) 
         @RequestBody InventoryItem item) {
         if (inventoryItems.containsKey(id)) {
             InventoryItem updatedItem = new InventoryItem(id, item.getName(), item.getQuantity(), item.getPrice());
             inventoryItems.put(id, updatedItem);
             return ResponseEntity.ok(updatedItem);
         } else {
-            return ResponseEntity.notFound().build();
+            ErrorResponse error = ErrorResponse.of(
+                "Unable to update. Item not found with id: " + id,
+                "ITEM_NOT_FOUND",
+                "/api/inventory/" + id
+            );
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(error);
         }
     }
 
