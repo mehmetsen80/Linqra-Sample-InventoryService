@@ -3,12 +3,18 @@ package org.lite.inventory.config;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lite.inventory.filter.JwtRoleValidationFilter;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -20,6 +26,18 @@ public class SecurityConfig {
 
     //It will be called even though you don't use it here, so don't remove it
     private final JwtRoleValidationFilter jwtRoleValidationFilter;
+
+
+    @Bean
+    JwtDecoder jwtDecoder(OAuth2ResourceServerProperties properties) {
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(properties.getJwt().getJwkSetUri()).build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                // Skip issuer validation or validate against multiple issuers
+                token -> OAuth2TokenValidatorResult.success(),
+                new JwtTimestampValidator()
+        ));
+        return decoder;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,7 +54,7 @@ public class SecurityConfig {
                         ))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/inventory-service/**")//no matter what you put here, if we have the gateway token from oauth2ResourceServer, we'll be authenticated
+                                .requestMatchers("/inventory-service/**", "/api/iventory/**", "/health/**")//no matter what you put here, if we have the gateway token from oauth2ResourceServer, we'll be authenticated
                                 .permitAll()  // Public endpoints (if any)
                                 .anyRequest()
                                 .authenticated()
