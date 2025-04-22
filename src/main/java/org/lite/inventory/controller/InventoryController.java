@@ -8,10 +8,13 @@ import org.lite.inventory.model.ErrorResponse;
 import org.lite.inventory.model.InventoryItemPatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.Collections;
 
 @Tag(name = "Inventory", description = "Inventory management APIs")
 @Slf4j
@@ -378,6 +382,73 @@ public class InventoryController {
                 "Error communicating with Product Service: " + e.getMessage(),
                 "PRODUCT_SERVICE_ERROR",
                 "/api/inventory/product-availability" + (productId != null ? "/" + productId : "")
+            );
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(error);
+        }
+    }
+
+    @Operation(summary = "Refresh API Gateway routes",
+              description = "Triggers a refresh of the API Gateway's route configurations")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", 
+                    description = "Successfully refreshed routes",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Map.class))),
+        @ApiResponse(responseCode = "500", 
+                    description = "Error refreshing routes",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "503", 
+                    description = "API Gateway is unavailable",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/refresh-routes", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> refreshGatewayRoutes() {
+        String url = gatewayBaseUrl + "/api/routes/refresh/routes";
+        
+        try {
+            // Create HttpHeaders with required headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            // Create HttpEntity with headers
+            HttpEntity<?> entity = new HttpEntity<>(headers);
+            
+            // Use exchange instead of getForEntity to include headers
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+            
+            log.info("Gateway routes refresh response: {}", response.getBody());
+            
+            if (response.getBody() == null) {
+                ErrorResponse error = ErrorResponse.of(
+                    "No response received from API Gateway",
+                    "GATEWAY_SERVICE_ERROR",
+                    "/api/inventory/refresh-routes"
+                );
+                return ResponseEntity
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(error);
+            }
+            
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response.getBody());
+                
+        } catch (Exception e) {
+            log.error("Error refreshing gateway routes: {}", e.getMessage(), e);
+            ErrorResponse error = ErrorResponse.of(
+                "Error communicating with API Gateway: " + e.getMessage(),
+                "GATEWAY_SERVICE_ERROR",
+                "/api/inventory/refresh-routes"
             );
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

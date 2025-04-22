@@ -30,22 +30,26 @@ public class JwtRoleValidationFilter extends OncePerRequestFilter {
         if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
             // Log the JWT token for debugging purposes
             log.info("JWT Token: {}", jwt.getTokenValue());
-            // Log roles for debugging
-            List<String> realmRoles = (List<String>) jwt.getClaimAsMap("realm_access").get("roles");
-            log.info("Realm Roles: {}", realmRoles);
-
+            log.info("Realm Roles: {}", jwt.getClaimAsStringList("realm_access.roles"));
             Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
             log.info("Client Roles: {}", resourceAccess);
 
             if (hasRequiredRole(jwt)) {
-                filterChain.doFilter(request, response); // Continue the request processing
+                log.info("Required roles found, proceeding with request to: {}", request.getRequestURI());
+                try {
+                    filterChain.doFilter(request, response);
+                } catch (Exception e) {
+                    log.info("Error during filter chain execution: {}", e.getMessage());
+                    log.info("Full error: ", e);
+                    throw e;
+                }
             } else {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN); // Return 403 Forbidden if role check fails
+                log.warn("Required roles not found in token");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
         } else {
-            //It's up to you which line do you want to enable, the latter one is more secure, as you don't force the call to use a jwt token
-            //filterChain.doFilter(request, response); // No JWT token, continue request processing, i.e. calling the GET from browser
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // Return 403 Forbidden if role check fails, you are forcing to use the token
+            log.warn("No JWT token found in request");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
