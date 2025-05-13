@@ -6,11 +6,25 @@ FROM maven:3.9.8-eclipse-temurin-21-jammy AS build
 # Set the working directory in the build image
 WORKDIR /app
 
+# Debug: List what's being copied
+RUN pwd
+RUN ls -la
+
 # Copy the entire project to the Docker container
 COPY . .
 
 # Build only the `inventory-service` module and package it as a JAR
 RUN mvn clean install
+
+# Debug: List all compiled classes
+RUN find /app/target -type f -name "*.class"
+
+# Debug: List the contents of the JAR
+RUN jar tf /app/target/ProductService.jar
+
+RUN find /app/target -name "*.class" | grep ProductServiceApplication
+
+RUN ls -ltr /app/target/*.jar
 
 # Stage 2: Create the runtime image with OpenJDK and application JAR
 FROM eclipse-temurin:21-jdk-jammy
@@ -23,6 +37,9 @@ WORKDIR /app
 
 # Copy the application JAR from the build image
 COPY --from=build /app/target/InventoryService.jar InventoryService.jar
+
+RUN ls -ltr ProductService.jar
+RUN jar tf ProductService.jar | grep ProductServiceApplication
 
 # Copy the keystore and truststore files
 COPY keys/inventory-keystore-container.jks client-keystore.jks

@@ -54,7 +54,7 @@ public class SecurityConfig {
                         ))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/inventory-service/**")//no matter what you put here, if we have the gateway token from oauth2ResourceServer, we'll be authenticated
+                                .requestMatchers("/r/inventory-service/**")//no matter what you put here, if we have the gateway token from oauth2ResourceServer, we'll be authenticated
                                 .permitAll()  // Public endpoints (if any)
                                 .anyRequest()
                                 .authenticated()

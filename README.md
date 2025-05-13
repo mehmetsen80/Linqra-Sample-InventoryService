@@ -6,6 +6,17 @@ This microservice manages inventory data for the LINQRA system. It provides REST
 
 ```
 LINQRA_INVENTORY_SERVICE/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── .kube/
+│   └── inventory/
+│       └── Dockerfile
+├── keys/
+│   ├── client-truststore.jks
+│   └── inventory-keystore-container.jks
+├── docker-compose.yml
+├── docker-compose-ec2.yml
 ├── pom.xml
 └── src/
     └── main/
@@ -26,8 +37,10 @@ LINQRA_INVENTORY_SERVICE/
         │               ├── interceptor/
         │               │   └── ServiceNameInterceptor.java
         │               └── model/
+        │                   ├── ErrorResponse.java
         │                   ├── HealthStatus.java
         │                   ├── InventoryItem.java
+        │                   ├── InventoryItemPatch.java
         │                   ├── ProductAvailabilityResponse.java
         │                   └── ProductInfo.java
         └── resources/
@@ -102,17 +115,17 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Get All Inventory Items
 - **Method**: GET
-- **URL**: `https://localhost:7777/inventory-service/api/inventory`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory`
 - **Headers**: `Accept: application/json`
 
 #### Get Specific Inventory Item
 - **Method**: GET
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/1`
 - **Headers**: `Accept: application/json`
 
 #### Create New Inventory Item
 - **Method**: POST
-- **URL**: `https://localhost:7777/inventory-service/api/inventory`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory`
 - **Headers**: 
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -127,7 +140,7 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Update Existing Inventory Item
 - **Method**: PUT
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/1`
 - **Headers**: 
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -142,11 +155,11 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Delete Inventory Item
 - **Method**: DELETE
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/3`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/3`
 
 #### Patch Inventory Item (Partial Update)
 - **Method**: PATCH
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/1`
 - **Headers**: 
   - `Content-Type: application/json`
   - `Accept: application/json`
@@ -159,7 +172,7 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Check Item Existence (HEAD)
 - **Method**: HEAD
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/1`
 - **Headers**: `Accept: application/json`
 - **Response Headers**:
   - `X-Item-Found`: indicates if item exists
@@ -167,7 +180,7 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Get Available Methods (OPTIONS)
 - **Method**: OPTIONS
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/1`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/1`
 - **Headers**: `Accept: application/json`
 - **Response Headers**:
   - `Allow`: lists all allowed HTTP methods
@@ -175,12 +188,12 @@ This service communicates with the Product Service microservice. Before using th
 
 #### Get Product Availability
 - **Method**: GET
-- **URL**: `https://localhost:7777/inventory-service/api/inventory/product-availability`
+- **URL**: `https://localhost:7777/r/inventory-service/api/inventory/product-availability`
 - **Headers**: `Accept: application/json`
 
 #### Check Service Health
 - **Method**: GET
-- **URL**: `https://localhost:7777/inventory-service/health`
+- **URL**: `https://localhost:7777/r/inventory-service/health`
 - **Headers**: `Accept: application/json`
 
 ## Configuration
@@ -189,7 +202,7 @@ In the `application.yml` file:
 
 ```yaml
 gateway:
-  base-url: https://localhost:7777/inventory-service  # Set to your API gateway URL
+  base-url: https://localhost:7777/r/inventory-service  # Set to your API gateway URL
 ```
 
 ## Dependencies

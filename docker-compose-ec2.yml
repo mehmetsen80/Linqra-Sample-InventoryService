@@ -1,0 +1,28 @@
+networks:
+  linqra-network:
+    external: true
+
+services:
+  inventory-service:
+    build:
+      context: .
+      dockerfile: ./.kube/inventory/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ec2
+      CLIENT_TRUST_STORE: /app/client-truststore.jks
+      CLIENT_TRUST_STORE_PASSWORD: 123456
+      CLIENT_KEY_STORE: /app/client-keystore.jks
+      CLIENT_KEY_STORE_PASSWORD: 123456
+      CLIENT_ALIAS_NAME: inventory-service-container
+      EUREKA_CLIENT_URL: discovery-service
+      EUREKA_INSTANCE_URL: inventory-service
+      KEYCLOAK_GATEWAY_URL: keycloak-service
+      KEYCLOAK_GATEWAY_PORT: 8080/keycloak
+      GATEWAY_SERVICE_URL: api-gateway-service
+    deploy:
+      replicas: 3
+    networks:
+      - linqra-network
+    volumes:
+      - ./:/app/inventory-service
+      - ./keys:/app/keys
