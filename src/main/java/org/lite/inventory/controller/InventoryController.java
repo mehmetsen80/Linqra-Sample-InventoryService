@@ -335,7 +335,7 @@ public class InventoryController {
                   example = "123") 
         @RequestParam(required = false) String productId) {
         
-        String url = gatewayBaseUrl + "/product-service/api/product/products";
+        String url = gatewayBaseUrl + "/r/product-service/api/product/products";
         if (productId != null) {
             url += "/" + productId;
         }
