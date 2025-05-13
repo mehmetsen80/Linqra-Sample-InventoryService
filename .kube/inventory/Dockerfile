@@ -20,9 +20,9 @@ RUN mvn clean install
 RUN find /app/target -type f -name "*.class"
 
 # Debug: List the contents of the JAR
-RUN jar tf /app/target/ProductService.jar
+RUN jar tf /app/target/InventoryService.jar
 
-RUN find /app/target -name "*.class" | grep ProductServiceApplication
+RUN find /app/target -name "*.class" | grep InventoryServiceApplication
 
 RUN ls -ltr /app/target/*.jar
 
@@ -38,8 +38,8 @@ WORKDIR /app
 # Copy the application JAR from the build image
 COPY --from=build /app/target/InventoryService.jar InventoryService.jar
 
-RUN ls -ltr ProductService.jar
-RUN jar tf ProductService.jar | grep ProductServiceApplication
+RUN ls -ltr InventoryService.jar
+RUN jar tf InventoryService.jar | grep InventoryServiceApplication
 
 # Copy the keystore and truststore files
 COPY keys/inventory-keystore-container.jks client-keystore.jks
