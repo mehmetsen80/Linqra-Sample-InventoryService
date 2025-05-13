@@ -222,6 +222,65 @@ cd LINQRA_INVENTORY_SERVICE
 mvn spring-boot:run
 ```
 
+## EC2 Deployment
+
+### GitHub Actions Configuration
+
+The service uses GitHub Actions for continuous integration and deployment to EC2. To set up the deployment pipeline, configure the following secrets in your GitHub repository:
+
+1. `EC2_SSH_KEY_PROD`: Your EC2 instance's private key (PEM file content)
+   ```bash
+   # Get the content of your EC2 key file
+   sudo cat /path/to/your-ec2-file.pem
+   ```
+
+2. `HOST_DNS_PROD`: Your EC2 instance's public DNS
+   ```
+   ec2-xx-xx-xx-xx.us-west-2.compute.amazonaws.com
+   ```
+
+3. `USERNAME_PROD`: EC2 instance username
+   ```
+   ubuntu
+   ```
+
+4. `TARGET_DIR_PROD`: Deployment directory on EC2
+   ```
+   /var/www/inventory-service
+   ```
+
+### Docker Management on EC2
+
+#### Cleanup Docker Environment
+To remove all unused Docker resources (networks, volumes, images):
+```bash
+docker system prune -a -f
+```
+
+#### Build and Run Service
+To build and start only the inventory service:
+```bash
+sudo docker compose up -d --build inventory-service
+```
+
+#### Monitoring
+To view service logs:
+```bash
+sudo docker logs inventory-service
+```
+
+#### Health Check
+To verify the service health through the API Gateway container:
+```bash
+# Basic health check
+docker exec -it linqra-api-gateway-service-1 curl -k -v https://api-gateway-service:7777/r/inventory-service/health
+
+# Health check with JWT token (optional)
+docker exec -it linqra-api-gateway-service-1 curl -k -H "Authorization: Bearer <ACCESS_TOKEN>" -v https://api-gateway-service:7777/r/inventory-service/health
+```
+
+**Note**: When checking health through the API Gateway container, authentication is not required as both services are on the same Docker network.
+
 ## Service Startup Order
 
 For proper functionality, services should be started in the following order:
@@ -236,3 +295,4 @@ For proper functionality, services should be started in the following order:
 - Mock data is provided for demonstration purposes
 - For production use, replace the in-memory storage with a proper database
 - Communication between services happens through the API Gateway
+
