@@ -8,7 +8,6 @@ import org.lite.inventory.model.ErrorResponse;
 import org.lite.inventory.model.InventoryItemPatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
