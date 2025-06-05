@@ -8,6 +8,7 @@ services:
       context: .
       dockerfile: ./.kube/inventory/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       CLIENT_TRUST_STORE: /app/client-truststore.jks
       CLIENT_TRUST_STORE_PASSWORD: 123456
       CLIENT_KEY_STORE: /app/client-keystore.jks

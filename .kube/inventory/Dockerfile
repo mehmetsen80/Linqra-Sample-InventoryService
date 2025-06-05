@@ -42,7 +42,7 @@ RUN ls -ltr InventoryService.jar
 RUN jar tf InventoryService.jar | grep InventoryServiceApplication
 
 # Copy the keystore and truststore files
-COPY keys/inventory-keystore-container.jks client-keystore.jks
+COPY keys/inventory-service-keystore-container.jks client-keystore.jks
 COPY keys/client-truststore.jks client-truststore.jks
 
 # Set permissions for keystore and truststore files
