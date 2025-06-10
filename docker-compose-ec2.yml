@@ -20,7 +20,7 @@ services:
       KEYCLOAK_GATEWAY_PORT: 8080/keycloak
       GATEWAY_SERVICE_URL: api-gateway-service
     deploy:
-      replicas: 3
+      replicas: 1
     networks:
       - linqra-network
     volumes:
